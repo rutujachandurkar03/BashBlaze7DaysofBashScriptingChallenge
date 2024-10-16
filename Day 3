@@ -1,0 +1,123 @@
+#!/bin/bash
+
+
+# Function to display help/usage information
+show_help() {
+    echo "Usage: $0 [OPTION]"
+    echo "User Account Management Script"
+    echo ""
+    echo "Options:"
+    echo "  -c, --create   Create a new user account"
+    echo "  -d, --delete   Delete an existing user account"
+    echo "  -r, --reset    Reset the password for an existing user account"
+    echo "  -l, --list     List all user accounts with their UIDs"
+    echo "  -h, --help     Display this help and exit"
+    exit 0
+}
+
+
+# Function to create a new user account
+create_user() {
+    read -p "Enter the username for the new account: " username
+
+    # Check if the username already exists
+    if id "$username" &>/dev/null; then
+        echo "Error: The username '$username' already exists."
+        exit 1
+    fi
+
+    # Prompt for the password
+    read -s -p "Enter the password for the new account: " password
+    echo
+
+    # Create the user account
+    sudo useradd -m "$username"
+
+    # Set the password for the user
+    echo "$username:$password" | sudo chpasswd
+
+    # Check if the account was created successfully
+    if [ $? -eq 0 ]; then
+        echo "Success: User '$username' created successfully."
+    else
+        echo "Error: Failed to create user '$username'."
+        exit 1
+    fi
+}
+
+
+# Function to delete a user account
+delete_user() {
+    read -p "Enter the username of the account to delete: " username
+
+    # Check if the username exists
+    if ! id "$username" &>/dev/null; then
+        echo "Error: The username '$username' does not exist."
+        exit 1
+    fi
+
+    # Delete the user account
+    sudo userdel -r "$username"
+
+    # Check if the account was deleted successfully
+    if [ $? -eq 0 ]; then
+        echo "Success: User '$username' deleted successfully."
+    else
+        echo "Error: Failed to delete user '$username'."
+        exit 1
+    fi
+}
+
+# Function to reset the password of an existing user account
+reset_password() {
+    read -p "Enter the username for the password reset: " username
+
+    # Check if the username exists
+    if ! id "$username" &>/dev/null; then
+        echo "Error: The username '$username' does not exist."
+        exit 1
+    fi
+
+    # Prompt for the new password
+    read -s -p "Enter the new password: " password
+    echo
+
+    # Set the new password for the user
+    echo "$username:$password" | sudo chpasswd
+
+    # Check if the password was reset successfully
+    if [ $? -eq 0 ]; then
+        echo "Success: Password for user '$username' has been reset."
+    else
+        echo "Error: Failed to reset password for user '$username'."
+        exit 1
+    fi
+}
+
+# Function to list all user accounts with their UIDs
+list_users() {
+    echo "List of users and their UIDs:"
+    awk -F':' '{ print $1, $3 }' /etc/passwd
+}
+# Main script logic to handle options
+case "$1" in
+    -c|--create)
+        create_user
+        ;;
+    -d|--delete)
+        delete_user
+        ;;
+    -r|--reset)
+        reset_password
+        ;;
+    -l|--list)
+        list_users
+        ;;
+    -h|--help)
+        show_help
+        ;;
+    *)
+        echo "Invalid option: $1"
+        show_help
+        ;;
+esac
