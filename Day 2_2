@@ -1,0 +1,69 @@
+Day 2 Bash Scripting Challenge - Interactive File and Directory Explorer
+#Task1 #File and Directory Exploration
+
+👉 Upon execution without any command-line arguments, the script will display a welcome message and list all the files and directories in the current path.
+👉For each file and directory, the script will print its name and size in human-readable format (e.g., KB, MB, GB). This information will be obtained using the ls command with appropriate options.
+👉The list of files and directories will be displayed in a loop until the user decides to exit the explorer.
+After displaying the file and directory list, the script will prompt the user to enter a line of text.
+The script will read the user's input until an empty string is entered (i.e., the user presses Enter without any text).
+For each line of text entered by the user, the script will count the number of characters in that line.
+The character count for each line entered by the user will be displayed.
+#!/bin/bash
+
+#Day 2 Bash Scripting Challenge - Interactive File and Directory Explorer
+
+echo "welcome to Bash Scripting Challenge"
+
+
+#List all files and directories in the current path
+
+while true; do
+
+echo "Files and Directories in the Current Path:"
+
+ls -lh
+
+        echo ""
+
+        echo "1. Refresh file list"
+
+        echo "2. Exit explorer"
+
+        echo -n "Choose an option (1 or 2): "
+
+        read -r user_input
+
+        if [ "$user_input" == "1" ]; then
+
+            clear
+
+            echo "welcome to Bash Scripting Challenge"
+
+                  elif [ "$user_input" == "2" ]; then
+
+                          echo "Exiting the explorer."
+
+            break
+        else
+
+           echo "Invalid choice. Please enter 1 or 2."
+        fi
+done
+
+
+#Character Counting
+
+
+read -p "Enter a line of text (Press Enter without text to exit): " line
+
+if [ -z "$line" ]; then
+
+        echo "Exiting the Interactive Explorer. Goodbye!"
+else
+
+char_count=$(echo -n "$line" | wc -m)
+
+    echo "Character Count: $char_count"
+
+fi
+
